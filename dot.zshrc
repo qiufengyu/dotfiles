@@ -110,6 +110,41 @@ alias rm="trash"
 function lc {
   current_year_month=$(date -u "+%Y-%m")
   current_day=$(date -u "+%d")
+  workdir="$HOME/Documents/Workspace/LetsCode/Challenge-${current_year_month}"
+  if ! [[ -d $workdir ]]; then
+    mkdir "${workdir}"
+  fi
+  problem=$1
+  if [[ -z ${problem} ]]; then
+    code "${workdir}"
+  else
+    IFS='.'  
+    read -rA parts <<< "$problem"
+    unset IFS
+    code "${workdir}"
+    if [[ ${#parts[@]} -eq 2 ]]; then
+      code_file="${workdir}/${current_day}-${problem}"
+      if [[ ${parts[2]} = "cpp" ]]; then
+        echo "#include \"../header.h\"\n" >> "${code_file}"
+        code -g "${code_file}:3"
+      elif [[ ${parts[2]} = "py" ]]; then
+        echo "from typing import List\n" >> "${code_file}"
+        code -g "${code_file}:3"
+      else
+        code -g "${code_file}:1"
+      fi
+      return
+    fi
+    code_file="${workdir}/${current_day}-${problem}.py"
+    echo "from typing import List\n" >> "${code_file}"
+    code "${workdir}"
+    code -g "${code_file}:3"
+  fi
+}
+
+function lc2 {
+  current_year_month=$(date -u "+%Y-%m")
+  current_day=$(date -u "+%d")
   if ! [[ -d "$HOME/Documents/Workspace/LetsCode/Challenge-${current_year_month}" ]]; then
     mkdir "$HOME/Documents/Workspace/LetsCode/Challenge-${current_year_month}"
   fi
